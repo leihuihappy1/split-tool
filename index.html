@@ -148,8 +148,13 @@
         <h1>图片 & PDF 竖切工具（绝不切字）</h1>
 
         <div class="upload-area" id="uploadArea">
-            <p>点击或拖拽上传 图片 或 PDF 文件</p>
-            <input type="file" id="fileInput" accept="image/*,.pdf">
+            <p>点击上传 图片 或 PDF 文件</p>
+            <p style="color:#007aff;margin-top:8px;font-size:14px;">📌 手机如只显示相册，请点「文件/文档」</p>
+            <input 
+                type="file" 
+                id="fileInput" 
+                accept=".jpg,.jpeg,.png,.gif,.pdf,image/jpeg,image/png,image/gif,application/pdf"
+            >
         </div>
 
         <div id="loading" class="loading" style="display:none;">正在处理，请稍候...</div>
@@ -296,62 +301,85 @@
                     return false;
                 }
             }
-            return true;
+            return   返回 true   真正的;
         }
 
         // ============== 显示结果 ==============
-        function addResult(label, leftCanvas, rightCanvas) {
-            const div = document.createElement('div');
-            div.className = 'result';
+        function addResult(label, leftCanvas, rightCanvas) {function   函数 addResult( 右画布) {
+            const div = document.createElement('div');const   常量 div = document   文档.createElement('div'   “div”)； 
 
-            const title = document.createElement('div');
-            title.className = 'page-title';
-            title.textContent = label;
-            div.appendChild(title);
+// 直接翻译为中文：
+const div = 文档.createElementconst div = document   文档.createElement
+            div.className = 'result';   div 的 className    类名称属性值设result" 。   “。
 
-            const row = document.createElement('div');
-            row.className = 'page-images';
+            const title = document.createElement('div');const   常量 标题 = document   文档.createElement('div'   “div”)；
+            title.className = 'page-title';title   标题.className   类名称 = '页面
+            title.textContent = label;   标题的文本内容等于标签。
+            div.appendChild(title);   div 元素添加 title    标题元素作为子元素。
 
-            row.appendChild(createItem(leftCanvas, `${label}-左.png`));
-            row.appendChild(createItem(rightCanvas, `${label}-右.png`));
+            const row = document.createElement('div');const   常量 行 = document   文档.createElement('div'   “div”)；
+            row.className = 'page-images';行的 className    类名称属性设为“page-images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；
 
-            div.appendChild(row);
-            result.appendChild(div);
+            row.appendChild(createItem(leftCanvas, `${label}-左.png`));row   行.appendChild   列表末尾(createItem(leftCanvas, `${label   标签}-left.png`));
+            row.appendChild(createItem(rightCanvas, `${label}-右.png`));row   行.appendChild   列表末尾(createItem(rightCanvas, `${label   标签}-right.png`));
+
+            div.appendChild(row);   div 元素添加行元素 row    行作为其子元素。
+            result.appendChild(div);   result    结果节点追加 div 节点。
         }
 
-        function createItem(canvas, name) {
-            const d = document.createElement('div');
-            d.className = 'result-item';
+        function createItem(canvas, name) {function   函数 createItem(canvas      帆布帆布, name      名字名字) {
+  创建项目（canvas， name） {
+  创建物品（画布， 名
+            const d = document.createElement('div');const   常量 d = document   文档.createElement('div'   “div”)； 
 
-            const img = document.createElement('img');
+译文：const d = document.createElement('div')； （此句为 JavaScriptconst d = document   文档.createElement('div'   “div”);
+            d.className = 'result-item';d.className   类名称 = '结果项'；
+
+            const img = document.createElement('img');const   常量 img = document   文档.createElement('img'   “img”)； 
+
+// 直接翻译为中文
+const img = 文档.createElementconst img = document   文档.createElement
             img.src = canvas.toDataURL('image/png');
-            img.className = 'result-img';
+            img.className = 'result-img';img 的 className    类名称属性值设result-img"；   “;
 
             // 下载
-            const dl = document.createElement('button');
+            const dl = document.createElement('button');const   常量   戴斯。莱纳姆: dl      戴斯。莱纳姆:戴斯。莱纳姆: = document   文档.createElement('button'   “按钮”);  // 创建一个按钮元素并赋值给常量 dl
             dl.className = 'btn';
-            dl.textContent = '下载';
-            dl.onclick = () => {
-                const a = document.createElement('a');
-                a.download = name;
+            dl.textContent = '下载';   dl   戴斯。莱纳姆:.textContent = 'Download'   “下载”;
+            dl.onclick = () => {   `dl`   “dl” 点击时执行以下操作：
+                const a = document.createElement('a');const   常量   一个 a      一个一个 = document   文档.createElement('a'   “一个”)； 
+
+// 直接翻译为中文：
+const a = 文档.createElement   const   常量   一个 a      一个一个 = document   文档.createElement
+                a.download = name;   A   一个.download   下载 = name；   名称;
                 a.href = canvas.toDataURL('image/png');
                 a.click();
             };
 
             // 打印
-            const print = document.createElement('button');
+            const print = document.createElement('button');const   常量   打印 print      打印打印 = document   文档.createElement('button'   “按钮”);  // 创建一个按钮元素并赋值给常量 print
             print.className = 'btn btn-print';
-            print.textContent = '打印';
-            print.onclick = () => {
-                printArea.style.display = 'block';
-                printArea.innerHTML = `<img src="${canvas.toDataURL('image/png')}" style="max-width:100%">`;
-                window.print();
-                setTimeout(() => printArea.style.display = 'none', 500);
+            print.textContent = '打印';   print   打印.textContent = 'Print'   “打印”;
+            print.onclick = () => {   打印按钮的点击事件处理程序如下：
+                printArea.style.display = 'block';打印区域的样式显示设置为“块”；
+                printArea.innerHTML = `<img src="${canvas.toDataURL('image/png')}" style="max-width:100%">`;printArea.innerHTML = `<img src="   `<img src   帆布="${canvas.toDataURL('image/png')}" " style="max   风格-width:100%">`style="max-width:100%">`;
+                window   窗口.print   打印();
+                setTimeout(() => printArea.style.display = 'none', 500);setTimeout(() => printArea.style.display = 'none', setTimeout(() => printArea.style   风格.display   显示 = 'none'   “没有”, 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；500)； 
+
+// 翻译为：
+
+setTimeout(() => printArea.style.display = 'none', 500)； setTimeout(() => printArea.style   风格.display   显示 = 'none'   “没有”, 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；
+
+// 直接
             };
 
-            d.append(img, dl, print);
-            return d;
+            d.append(img, dl, print);   d.append(img, dl, print);  // d.append(img, dl, print)； 由于此行代码为编程
+            return d;   返回d;
         }
-    </script>
-</body>
-</html>
+    </script>   < / script>
+</body>   < / body>
+</   & lt;html>   < / html>
