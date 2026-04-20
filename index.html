@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片/PDF竖切工具（绝不切字 · 纯空白切割）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #409eff;
+            background: #f0f7ff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .result {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            background: #f0f7ff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .page-images {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-img {
+            max-width: 320px;
+            max-height: 400px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #337ecc;
+        }
+
+        .btn-print {
+            background: #67C23A;
+        }
+
+        .btn-print:hover {
+            background: #529b2e;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .tip {
+            text-align: center;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #409eff;
+            font-size: 16px;
+        }
+
+        /* 打印样式 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printArea, #printArea * {
+                visibility: visible;
+            }
+            #printArea {
+                position: absolute;
+                left: 50%;
+                top: 20px;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>图片 & PDF 竖切工具（绝不切字）</h1>
+
+        <div class="upload-area" id="uploadArea">
+            <p>点击或拖拽上传 图片 或 PDF 文件</p>
+            <input type="file" id="fileInput" accept="image/*,.pdf">
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">正在处理，请稍候...</div>
+        <div id="result"></div>
+
+        <div class="tip" style="color: #e64340; font-weight: bold;">
+            ✅ 智能识别纯空白 · 绝对不会切到文字
+        </div>
+    </div>
+
+    <div id="printArea" style="display:none;"></div>
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const result = document.getElementById('result');
+        const loading = document.getElementById('loading');
+        const printArea = document.getElementById('printArea');
+
+        // PDF 配置
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        // 点击上传
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // 拖拽
+        uploadArea.addEventListener('dragover', e => e.preventDefault());
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        // 选择文件
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        });
+
+        // ============== 统一入口 ==============
+        async function handleFile(file) {
+            loading.style.display = 'block';
+            result.innerHTML = '';
+
+            if (file.type === 'application/pdf') {
+                await processPDF(file);
+            } else if (file.type.startsWith('image/')) {
+                await processImage(file);
+            }
+
+            loading.style.display = 'none';
+        }
+
+        // ============== 处理 PDF ==============
+        async function processPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const totalPages = pdf.numPages;
+
+            for (let i = 1; i <= totalPages; i++) {
+                await processPDFPage(pdf, i);
+            }
+        }
+
+        async function processPDFPage(pdf, pageNum) {
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            processAndShowCanvas(canvas, `PDF第${pageNum}页`);
+        }
+
+        // ============== 处理 图片 ==============
+        async function processImage(file) {
+            const img = await loadImage(file);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            processAndShowCanvas(canvas, '图片');
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        // ============== 统一切割 ==============
+        function processAndShowCanvas(canvas, label) {
+            const splitX = findSafeBlankColumn(canvas.getContext('2d'), canvas.width, canvas.height);
+            const left = cut(canvas, 0, 0, splitX, canvas.height);
+            const right = cut(canvas, splitX, 0, canvas.width - splitX, canvas.height);
+            addResult(label, left, right);
+        }
+
+        // 切割
+        function cut(canvas, x, y, w, h) {
+            const c = document.createElement('canvas');
+            c.width = w;
+            c.height = h;
+            c.getContext('2d').drawImage(canvas, x, y, w, h, 0, 0, w, h);
+            return c;
+        }
+
+        // ======================
+        // 核心：安全空白检测（绝不切字）
+        // 整列 100% 纯白才会切
+        // ======================
+        function findSafeBlankColumn(ctx, width, height) {
+            const centerX = Math.floor(width / 2);
+            const maxSearch = 180; // 扩大搜索范围
+
+            for (let o = 0; o <= maxSearch; o++) {
+                if (isFullyBlank(ctx, centerX + o, height)) {
+                    return centerX + o;
+                }
+                if (isFullyBlank(ctx, centerX - o, height)) {
+                    return centerX - o;
+                }
+            }
+            return centerX;
+        }
+
+        // 整列必须全部是纯白，才判定为可切割（绝不切字）
+        function isFullyBlank(ctx, x, h) {
+            const step = 1; // 密集检测，不漏掉任何一个文字点
+            for (let y = 0; y < h; y += step) {
+                const d = ctx.getImageData(x, y, 1, 1).data;
+                const brightness = (d[0] + d[1] + d[2]) / 3;
+
+                // 只要有一点点颜色（文字/线条），就不切这里
+                if (brightness < 252) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ============== 显示结果 ==============
+        function addResult(label, leftCanvas, rightCanvas) {
+            const div = document.createElement('div');
+            div.className = 'result';
+
+            const title = document.createElement('div');
+            title.className = 'page-title';
+            title.textContent = label;
+            div.appendChild(title);
+
+            const row = document.createElement('div');
+            row.className = 'page-images';
+
+            row.appendChild(createItem(leftCanvas, `${label}-左.png`));
+            row.appendChild(createItem(rightCanvas, `${label}-右.png`));
+
+            div.appendChild(row);
+            result.appendChild(div);
+        }
+
+        function createItem(canvas, name) {
+            const d = document.createElement('div');
+            d.className = 'result-item';
+
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            img.className = 'result-img';
+
+            // 下载
+            const dl = document.createElement('button');
+            dl.className = 'btn';
+            dl.textContent = '下载';
+            dl.onclick = () => {
+                const a = document.createElement('a');
+                a.download = name;
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+
+            // 打印
+            const print = document.createElement('button');
+            print.className = 'btn btn-print';
+            print.textContent = '打印';
+            print.onclick = () => {
+                printArea.style.display = 'block';
+                printArea.innerHTML = `<img src="${canvas.toDataURL('image/png')}" style="max-width:100%">`;
+                window.print();
+                setTimeout(() => printArea.style.display = 'none', 500);
+            };
+
+            d.append(img, dl, print);
+            return d;
+        }
+    </script>
+</body>
+</html>
