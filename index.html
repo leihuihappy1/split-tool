@@ -301,7 +301,7 @@
                     return false;
                 }
             }
-            return   返回 true   真正的;
+            return true;
         }
 
         // ============== 显示结果 ==============
@@ -318,7 +318,7 @@ const div = 文档.createElementconst div = document   文档.createElement
             div.appendChild(title);   div 元素添加 title    标题元素作为子元素。
 
             const row = document.createElement('div');const   常量 行 = document   文档.createElement('div'   “div”)；
-            row.className = 'page-images';行的 className    类名称属性设为“page-images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；
+            row.className = 'page-images';行的 className    类名称属性设为“page-images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；   images”；
 
             row.appendChild(createItem(leftCanvas, `${label}-左.png`));row   行.appendChild   列表末尾(createItem(leftCanvas, `${label   标签}-left.png`));
             row.appendChild(createItem(rightCanvas, `${label}-右.png`));row   行.appendChild   列表末尾(createItem(rightCanvas, `${label   标签}-right.png`));
@@ -363,8 +363,16 @@ const a = 文档.createElement   const   常量   一个 a      一个一个 = d
             print.onclick = () => {   打印按钮的点击事件处理程序如下：
                 printArea.style.display = 'block';打印区域的样式显示设置为“块”；
                 printArea.innerHTML = `<img src="${canvas.toDataURL('image/png')}" style="max-width:100%">`;printArea.innerHTML = `<img src="   `<img src   帆布="${canvas.toDataURL('image/png')}" " style="max   风格-width:100%">`style="max-width:100%">`;
-                window   窗口.print   打印();
-                setTimeout(() => printArea.style.display = 'none', 500);setTimeout(() => printArea.style.display = 'none', setTimeout(() => printArea.style   风格.display   显示 = 'none'   “没有”, 500)； 
+                setTimeout(()   打印 =>    窗口printArea.style   风格.display   显示 = 'none'   “没有”, 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；setTimeout(() => printArea.style.display = 'none', 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；window.print();
+                setTimeout(() => printArea.style.display = 'none', 500);setTimeout(() => printArea.style.display = 'none', setTimeout(() => printArea.style   风格.display   显示 = 'none'   “没有”, 500)； setTimeout(() => printArea.style   风格.display   显示 = 'none'   “没有”, 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；setTimeout(() => printArea.style.display = 'none', 500)； 
+
+// 等待 500 毫秒后将 printArea 的显示样式设置为“none”；
 
 // 等待 500 毫秒后将 printArea 的显示样式设置为“none”；500)； 
 
@@ -377,9 +385,9 @@ setTimeout(() => printArea.style.display = 'none', 500)； setTimeout(() => prin
 // 直接
             };
 
-            d.append(img, dl, print);   d.append(img, dl, print);  // d.append(img, dl, print)； 由于此行代码为编程
+            d.append(img, dl, print);   d.append(img, dl, print);  // d.append(img, dl, print)； 由于此行代码为编程d.append(img, dl, print);   d.append(img, dl, print);  // d.append(img, dl, print); Since this line of code is for programming
             return d;   返回d;
         }
-    </script>   < / script>
+    </script>   < / script>   </   & lt;script>   < / script>   </   & lt;script>   < / script>
 </body>   < / body>
-</   & lt;html>   < / html>
+</html>   < / html>
